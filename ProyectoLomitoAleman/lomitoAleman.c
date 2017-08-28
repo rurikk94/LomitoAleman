@@ -1,10 +1,11 @@
 #include <stdio.h>
 
-#define MAX 999;
+#define MAXPROD 999;
+#define MAXPROMO 50;
 
 struct LomitoAleman{
 
-	char *dueño;
+	char *dueÃ±o;
 	struct Sucursal *sucursales;
 
 }
@@ -14,8 +15,18 @@ struct Sucursal{
 	char *direccion;
 	char *administrador;
 	char *rutAdministrador;
+	struct Promocion *promociones[MAXPROMO]
 	struct NodoVentas *ventas;
-	struct Producto *productos [MAX];
+	struct Producto *productos [MAXPROD];
+
+}
+
+struct Promocion{
+
+	struct producto **consumo;
+	struct producto **liquido;
+	int codigo;
+	int precio;
 
 }
 
@@ -27,7 +38,7 @@ struct NodoVentas{
 }
 struct Producto{
 
-	char *codigo;
+	int codigo;
 	char *nombre;
 	int precio; //pesos Chilenos
 
@@ -51,7 +62,7 @@ struct NodoBoleta{
 
 }
 
-int minimain(){
+main(){
 
 	
 
