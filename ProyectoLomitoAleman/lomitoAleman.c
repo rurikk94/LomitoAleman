@@ -11,13 +11,14 @@ struct LomitoAleman{
 }
 
 struct Sucursal{
-
+	int id;
 	char *direccion;
 	char *administrador;
 	char *rutAdministrador;
 	struct Promocion *promociones[MAXPROMO]
 	struct NodoVentas *ventas;
 	struct Producto *productos [MAXPROD];
+	struct Sucursal *sig, *ant;
 
 }
 
@@ -63,7 +64,6 @@ struct NodoBoleta{
 
 main(){
 
-	
 
 }
 
@@ -228,11 +228,91 @@ char *ingresarChar(char *variable){ // devuelve un char que se ingresa
 	return nombre;
 }
 
-int ingresarPrecio(){ // devuelve un Int que se ingresa
-	int precio;
+int ingresarInt(char *nombreDato){ // devuelve un Int que se ingresa
+	int num;
 
-	printf(" \nIngrese el precio  \n");
-	scanf("%d",&precio);
+	printf(" \nIngrese %s  \n",nombreDato);
+	scanf("%d",&num);
 
-	return precio;
+	return um;
+}
+
+int agregarProductoAArreglo(struct Producto productos)
+{
+	struct Producto *rec=productos;
+	for (i=0;i<MAXPROD;i++)
+	{
+		if (rec[i]==NULL)
+		{
+			//crea un producto con los datos ingresados ylo guarda en producto en la posicion i
+			rec[i]=crearProducto(ingresarInt("Codigo Producto"),ingresarChar("Nombre Producto"),ingresarInt("Precio Producto")));
+			return 1;			
+		}
+	}
+	return 0;
+}
+
+int registrarProducto(int idSucursal,struct Sucursal *head)
+{
+	int resultado,i;
+	struct Sucursal *rec=head;
+
+	if (head!=NULL)
+	{
+		while(rec!=NULL)
+		{
+			if (idSucursal==rec->id) //si encuentra la sucursal
+			{
+				if (agregarProductoAArreglo(rec->productos)==1)
+					return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+void menu(int opcion, struct LomitoAleman *lomito)
+{
+	int res;
+
+	printf("Menu Principal:\n");
+	printf("\n");
+	printf ("ingrese una opcion");
+	printf("1.-Registrar producto\n");
+	printf("0.-Salir\n");
+	scanf("%d",&opcion);
+
+	switch(opcion)
+		{
+		case 1:
+		    res=registrarProducto(ingresarInt("Sucursal"),lomito->sucursales);//busca la sucursar e ingresa producto
+		    if(res==0)
+            {
+                printf("Error en registro del producto");
+            }
+            if(res==1)
+            {
+                printf("Se agrego el producto");
+            }
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		case 4:
+			break;
+		case 5:
+			break;
+		case 6:
+			break;
+		case 7:
+			break;
+		case 8:
+			break;
+		default:
+			break;
+		}
+
+	}while(opcion!=0);
+
 }
