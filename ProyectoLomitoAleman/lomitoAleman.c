@@ -67,3 +67,29 @@ main(){
 	
 
 }
+
+struct NodoBoleta * crearNodoBoleta (char *numeroBoleta){
+	struct NodoBoleta *nuevo;
+
+	nuevo = (struct NodoBoleta*) malloc (sizeof(struct NodoBoleta));
+
+	nuevo -> sig = NULL;
+
+	return nuevo;
+
+}
+
+struct VentasEnDia * crearVentasEnDia (int dia, int mes, int ano){
+	struct VentasEnDia *nuevo;
+
+	nuevo = (struct VentasEnDia*) malloc (sizeof(struct VentasEnDia));
+
+	nuevo -> head = NULL;
+	nuevo -> tail = NULL;
+
+	return nuevo;
+
+}
+
+
+
