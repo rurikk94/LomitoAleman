@@ -25,14 +25,13 @@ struct Promocion{
 
 	struct producto **consumo;
 	struct producto **liquido;
-	int codigo;
-	int precio;
+	struct producto *dato;
 
 }
 
 struct NodoVentas{
 
-	struct Venta *datos;
+	struct VentasEnDia *datos;
 	struct NodoVentas *sig,*ant;
 
 }
@@ -44,7 +43,7 @@ struct Producto{
 
 }
 
-struct Venta{
+struct VentasEnDia{
 
 	int dia;
 	int mes;
