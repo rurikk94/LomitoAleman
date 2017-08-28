@@ -240,14 +240,12 @@ int ingresarInt(char *nombreDato){ // devuelve un Int que se ingresa
 int agregarProductoAArreglo(struct Producto productos)
 {
 	struct Producto *rec=productos;
-	for (i=0;i<MAXPROD;i++)
+	int codProducto = ingresarInt("Codigo Producto");
+	if (rec[codProducto]==NULL)
 	{
-		if (rec[i]==NULL)
-		{
-			//crea un producto con los datos ingresados ylo guarda en producto en la posicion i
-			rec[i]=crearProducto(ingresarInt("Codigo Producto"),ingresarChar("Nombre Producto"),ingresarInt("Precio Producto")));
-			return 1;			
-		}
+		//crea un producto con los datos ingresados ylo guarda en producto en la posicion i
+		rec[codProducto]=crearProducto(codProducto,ingresarChar("Nombre Producto"),ingresarInt("Precio Producto")));
+		return 1;			
 	}
 	return 0;
 }
