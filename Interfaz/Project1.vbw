@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Inicializar = 118, 67, 1213, 753, C, 19, 69, 1104, 720, C
 MenuAdministrar = 37, 62, 1144, 496, C, 78, 63, 1185, 703, C
 CrearEmpresa = 40, 25, 1133, 681, C, 213, 111, 1306, 767, C
@@ -9,3 +10,13 @@ MenuSucursal = 180, 109, 1141, 736, C, 136, 218, 1211, 848, C
 AdministrarProductos = 230, 146, 1224, 776, C, 116, 100, 1110, 730, C
 AdministrarPromociones = 184, 123, 945, 792, C, 2, -3, 1135, 852, C
 venta = 177, 359, 1171, 799, C, 129, 76, 1123, 706, C
+=======
+Inicializar = 218, 40, 1313, 726, C, 19, 69, 1104, 720, C
+MenuAdministrar = 37, 62, 1144, 496, C, 78, 63, 1185, 703, C
+CrearEmpresa = 243, 20, 1336, 676, C, 213, 111, 1306, 767, C
+Error = 154, 164, 1247, 820, C, 155, 144, 1248, 800, C
+CrearNumSucursales = 13, 146, 1106, 802, C, 140, 114, 1233, 770, C
+f = 693, 27, 1333, 622, C
+seleccionarSucursal = 181, 218, 1278, 734, C, 286, 118, 758, 748, C
+MenuSucursal = 52, 52, 1369, 372, , 171, 151, 1409, 781, C
+>>>>>>> bd455ee94f4edfdeb8e4cbd70fc82f2db78e19fc
