@@ -1,3 +1,30 @@
+funciones.c
+DETALLES
+ACTIVIDAD
+funciones.c
+Información de uso compartido
+Cargando la información para compartir…
+Información general
+Tipo
+Texto
+Tamaño
+18 KB (18.147 bytes)
+Espacio usado
+18 KB (18.147 bytes)
+Propietario
+yo
+Modificado
+17:51 por mí
+Abierto
+22:54 por mí
+Creado el
+17:51 con Google Drive Web
+Descripción
+Añadir descripción
+Descargar permisos
+Los lectores pueden descargar
+Maximizado Se ha anulado la selección de todos los elementos 
+
 #include "funciones.h"
 
 struct Empresa *crearEmpresa(char *nombre,char *dueno){
@@ -35,19 +62,6 @@ int ingresarInt(const char *mensaje){ // devuelve un Int que se ingresa
     scanf("%d",&num);
 
     return num;
-}
-
-struct Producto *verificarDosProductosParaPromocion(struct Producto *productoConsumo, struct Producto *productoLiquido, struct Promocion **promociones){
-    int i;
-
-    if(productoConsumo != NULL && productoLiquido != NULL){
-        for( i = 1 ; i < MAXPROMOCIONES ; i++){
-            if(buscarConsumo(productoConsumo, promociones[i] -> consumo) && buscarLiquido(productoLiquido, promociones[i] -> liquido)){
-                return promociones[i] -> dato;
-            }
-        }
-    }
-    return NULL;
 }
 
 struct Producto *buscarConsumo (struct Producto *pConsumo, struct Producto **consumos){
@@ -107,22 +121,116 @@ struct Sucursal *buscarSucursal(struct Sucursal *head, int id){
     return NULL;
 }
 
-int agregarProducto (int codigo, char *nombre, int precio, struct Producto **productos){
+int agregarProducto (int codigo, char *nombre, int precio, struct Sucursal *sucur){
     struct Producto *nuevo;
-    
-    if(!buscarProducto(codigo, productos)){
+	struct NodoProductos *nodoNuevo;
+
+    if(!(sucur)){
+		nuevo = crearProducto(codigo, nombre, precio);
+		nodoNuevo = (struct NodoProductos *) malloc (sizeof(struct NodoProductos));
+	
+		nodoNuevo->datos = nuevo;
+		nodoNuevo->izq = NULL;
+		nodoNuevo->der = NULL;
+		sucur->productos=nodoNuevo;
+		return 1;
+	}
+    if(buscarProducto(codigo, sucur->productos)!=NULL){
         nuevo = crearProducto(codigo, nombre, precio);
-        productos[codigo] = nuevo;
+		agregarProductoEnArbol(nuevo,sucur->productos);
+		equilibrarArbol(sucur);
         return 1;
     }
     return 0;
 }
+int listarArbol(struct NodoProductos *productos,struct NodoProductos **ultimo){
+	if (productos){
+		(*ultimo)->der=productos;
+		(*ultimo)=productos;
+		listarArbol(productos->der,ultimo);
+		listarArbol(productos->izq,ultimo);
+	}
+	return 1;
+}
 
-struct Producto * buscarProducto (int codigo, struct Producto **productos){
-    if(productos[codigo] != NULL){
-        return productos[codigo];
-    }
-    return 0;
+int equilibrarArbol(struct Sucursal *sucur){
+	struct NodoProductos fantasma;
+	struct NodoProductos *Almacen=&fantasma;
+	
+	listarArbol(sucur->productos,&Almacen);
+	ordenamientoRecurcivo(&fantasma);
+	sucur->productos=fantasma.der;
+	return 1;
+}
+
+int ordenamientoRecurcivo(struct NodoProductos *ndo){
+	int i=0;
+	struct NodoProductos *rec=ndo->der;
+	struct NodoProductos *rec2=ndo->izq;
+	while(rec){
+		rec=rec->der;
+		i++;
+	}
+	if(i<2){
+		return 0;
+	}
+	i=(i/2);
+	rec=ndo->der;
+	for(i;i>0;i--){
+		if(rec){
+			rec=rec->der;
+		}
+		if(rec2){
+			rec2=rec2->izq;
+		}
+	}
+	rec->izq=ndo->der;
+	rec2->izq=ndo->izq;
+	ndo->der=rec;              
+	ndo->izq=rec2;
+	
+	ordenamientoRecurcivo(ndo->der);
+	ordenamientoRecurcivo(ndo->izq);
+	return 1;
+}
+
+int agregarProductoEnArbol(struct Producto *nuevo, struct NodoProductos *productos){
+	struct NodoProductos *rec = productos;
+	struct NodoProductos *nodoNuevo;
+	
+	nodoNuevo = (struct NodoProductos *) malloc (sizeof(struct NodoProductos));
+	
+	nodoNuevo->datos = nuevo;
+	nodoNuevo->izq = NULL;
+	nodoNuevo->der = NULL;
+	
+	while(rec->izq!=NULL){
+		rec=rec->izq;
+	}
+	rec->izq = nodoNuevo;
+	return 1;
+}
+
+struct NodoProductos * buscarProducto (int codigo, struct NodoProductos *productos){
+	struct NodoProductos * buscado=NULL;
+	if(productos){
+		if(productos->datos){
+			if(productos->datos->codigo){
+				if(productos->datos->codigo==codigo){
+					return productos;
+				}
+				buscado=buscarProducto (codigo, productos->izq);
+				if(buscado!=NULL){
+					return buscado;
+				}
+				buscado=buscarProducto (codigo, productos->der);
+				if(buscado!=NULL){
+					return buscado;
+				}
+			}
+		}
+	}
+    return NULL;
 }
 
 struct Producto * crearProducto (int codigoIngresado,char *nombreIngresado, int precioIngresado){
@@ -139,48 +247,28 @@ struct Producto * crearProducto (int codigoIngresado,char *nombreIngresado, int 
     return nuevo;
 }
 
-struct NodoBoleta * crearNodoBoleta (int numBoleta, int totalComprado){
+struct NodoBoleta * crearNodoBoleta (int numBoleta){
     struct NodoBoleta *nuevo;
 
     nuevo = (struct NodoBoleta*) malloc (sizeof(struct NodoBoleta));
     
     nuevo -> numeroBoleta = numBoleta;
-    nuevo -> total = totalComprado;
 
     nuevo -> sig = NULL;
 
     return nuevo;
 }
 
-struct Promocion * crearPromocion (struct Producto *product, struct Producto **consumos, struct Producto **liquidos){
-    struct Promocion *nuevo;
-
-    nuevo = (struct Promocion*) malloc (sizeof(struct Promocion));
-
-    nuevo -> consumo = consumos;
-    nuevo -> liquido = liquidos;
-    nuevo -> dato = product;
-
-    return nuevo;
-}
-
-int agregarPromocion (int codigo, char *nombre, int precio,struct Producto ** consumo, struct Producto **liquido, struct Sucursal *tienda){
-    if(!buscarProducto (codigo, tienda -> productos)){
-        tienda -> promociones[codigo] = crearPromocion(crearProducto(codigo, nombre, precio), consumo, liquido);
-        tienda -> productos[codigo] = tienda -> promociones[codigo] -> dato;
-    }
-    return 0;
-}
-
 int modificarProducto(int codigoIngresado, char *nombreIngresado, int precioIngresado, struct Sucursal *tienda)
 {
     struct Producto * modificacion;
-    int codigo;
-    
-    if(buscarProducto (codigoIngresado, tienda -> productos)){
-        codigo = buscarProducto (codigoIngresado, tienda -> productos) -> codigo;
+	struct NodoProductos * buscado;
+
+    buscado = buscarProducto (codigoIngresado, tienda -> productos);
+	
+    if(buscado){
         modificacion = crearProducto (codigoIngresado, nombreIngresado, precioIngresado);
-        tienda -> productos[codigo] = modificacion;
+        buscado->datos=modificacion;
         return 1;
     }
     return 0;
@@ -189,41 +277,6 @@ int modificarProducto(int codigoIngresado, char *nombreIngresado, int precioIngr
 struct Sucursal *modificarSucursal(char *direccionIngresada, char *administradorIngresada, char *rutAdministradorIngresada, struct Sucursal *sucursal){
     return NULL;
 }
-
-/*
-struct Sucursal *modificarSucursal(char *direccionIngresada, char *administradorIngresada, char *rutAdministradorIngresada, struct Sucursal *sucursal){
-    struct Sucursal *modificacion;
-    
-    modificacion = (struct Sucursal *)malloc (sizeof(struct Sucursal));
-
-    modificacion -> direccion = (char*) malloc (sizeof(char) * strlen(direccionIngresada));
-    modificacion -> direccion = direccionIngresada;
-
-    modificacion -> administrador = NULL;
-    modificacion -> administrador = (char*) malloc (sizeof(char) * strlen(administradorIngresada));
-    modificacion -> administrador = administradorIngresada;
- 
-    modificacion -> rutAdministrador = NULL;
-    modificacion -> rutAdministrador = (char*) malloc (sizeof(char) * strlen(rutAdministradorIngresada));
-    modificacion -> rutAdministrador = rutAdministradorIngresada;
-    
-    modificacion -> id =sucursal -> id;
-    modificacion -> promociones = sucursal -> promociones;
-    modificacion -> productos = sucursal -> productos;
-    modificacion -> ultimaBoleta = sucursal -> ultimaBoleta;
-    modificacion -> cajaAbierta = sucursal -> cajaAbierta;
-    modificacion -> ventas = sucursal -> ventas;
-    modificacion -> sig = sucursal -> sig;
-    modificacion -> ant = sucursal -> ant;
-    
-    sucursal -> sig -> ant = modificacion;
-    sucursal -> ant -> sig = modificacion;
-    
-    free(sucursal);
-
-    return modificacion;
-}
-*/
 
 struct Sucursal * crearSucursal (char *direccionIngresada, char * administradorIngresado, char *rutAdministradorIngresado, int idIngresada){
     struct Sucursal *nuevo;
@@ -241,7 +294,6 @@ struct Sucursal * crearSucursal (char *direccionIngresada, char * administradorI
     nuevo -> rutAdministrador = (char *) malloc (sizeof(char) * strlen(rutAdministradorIngresado));
     strcpy(nuevo -> rutAdministrador, rutAdministradorIngresado);
 
-    nuevo -> ultimaBoleta = NULL;
     nuevo -> cajaAbierta = NULL;
     nuevo -> ventas = NULL;
     
@@ -272,27 +324,36 @@ struct Ventas * crearVentas (int diaIngresado, int mesIngresado, int anoIngresad
     nuevo -> mes = mesIngresado;
     nuevo -> ano = anoIngresado;
     
-    nuevo -> head = crearNodoBoleta(0,0);
+    nuevo -> head = crearNodoBoleta(0);
     nuevo -> tail = nuevo -> head;
     
     return nuevo;
 }
 void imprimirBoleta (struct NodoBoleta *boleta){
+	int total;
     if(boleta != NULL){
+		total=calcularTotalBoleta(boleta);
         printf("\n\nNumero de Boleta: $d",boleta -> numeroBoleta);
-        printf("\nConsumo: %d",boleta -> total);
-        printf("\nPropina Sugerida: %d",(boleta -> total)/10);
-        printf("\nMonto Total: $d",boleta -> total + (boleta -> total)/10);
+        printf("\nConsumo: %d", total);
+        printf("\nPropina Sugerida: %d",total/10);
+        printf("\nMonto Total: $d",total + (total/10));
     }
     else{
         printf("\nNo Existe Boleta");
     }
 }
 
+int calcularTotalBoleta(struct NodoBoleta *boleta){
+	int i,suma=0;
+	for(i=0;i<boleta->nPV;i++){
+		suma = suma + boleta->productos[i]->precio;
+	}
+	return suma;
+}
 void mostrarSucursal (struct Sucursal *sucursal){
     if(sucursal != NULL){
         printf("\n\nID de Sucursal: %d",sucursal -> id);
-        printf("\nDirecci�n: %s",sucursal -> direccion);
+        printf("\nDirección: %s",sucursal -> direccion);
         printf("\nAdministrador: %s",sucursal -> administrador);
         printf("\nRut Administrador: %s",sucursal -> rutAdministrador);
     }
@@ -400,7 +461,7 @@ struct Producto ** crearArregloProductos(const char *mensaje, struct Sucursal *s
         printf("\nAgregue %s (0 para dejar de agregar)\n", mensaje);
         scanf("%d", &opcion);
         if (opcion){
-            buffer[i]=sucursal->productos[opcion];
+            buffer[i]=buscarProducto(opcion, sucursal->productos)->datos;
             i++;
         }
     }
@@ -430,13 +491,14 @@ int resumenVentas(int diaBuscado, int mesBuscado, int anoBuscado, struct NodoVen
 }
 
 int totalVendido (struct Ventas *ven){
-    int total = 0;
+    int total = 0,x;
     struct NodoBoleta *rec;
     
     if(ven != NULL){
         rec = ven -> head -> sig;
         while(rec != NULL){
-            total += rec -> total;
+			x=calcularTotalBoleta(rec);
+            total += x;
             rec = rec -> sig;
         }
     }
@@ -496,7 +558,7 @@ void abrirCaja(struct Sucursal *sucur){
         scanf("%d",&dia);
         printf("\nMes: ");
         scanf("%d", &mes);
-        printf("\nA�o: ");
+        printf("\nAño: ");
         scanf("%d",&ano);
         
         sucur -> ventas = crearNodoVentas ();
@@ -565,39 +627,20 @@ struct NodoVentas * buscarUltimoNodoVentas (struct NodoVentas *head){
 }
 
 int eliminarProducto(int codigo, struct Sucursal *sucursal){
-    if(buscarProducto(codigo, sucursal -> productos)){
-        ajustarPromocionesAsociadasAUnProducto (sucursal -> promociones, buscarProducto(codigo, sucursal -> productos));
-        sucursal -> productos[codigo] = NULL;
+	struct NodoProductos *buscado;
+	
+	buscado= buscarProducto(codigo, sucursal -> productos);
+	if(buscado){
+        agregarProductoEnArbol(buscado->der->datos,sucursal->productos);
+		agregarProductoEnArbol(buscado->izq->datos,sucursal->productos);
+		if(sucursal->productos->datos->codigo==codigo){
+			sucursal->productos=sucursal->productos->izq;
+		}
+		free(buscado);
+		equilibrarArbol(sucursal);
         return 1;
-    }
+    }    
     return 0;
-}
-
-void ajustarPromocionesAsociadasAUnProducto (struct Promocion **promociones, struct Producto *prod){
-    int i;
-    for( i = 0 ; i < MAXPROMOCIONES ; i++){
-        eliminarProductoDeConsumo(promociones[i], prod);
-        eliminarProductoDeLiquido(promociones[i], prod);
-        if(promociones[i] -> consumo == NULL || promociones[i] -> liquido == NULL){
-            promociones[i] = NULL;
-        }
-    }
-}
-
-void eliminarProductoDeConsumo (struct Promocion *promo, struct Producto *prod){
-    if(promo != NULL){
-        if(buscarConsumo (prod, promo -> consumo)){
-            promo -> consumo = ajustarArreglo(promo -> consumo, prod);
-        }
-    }
-}
-
-void eliminarProductoDeLiquido (struct Promocion *promo, struct Producto *prod){
-    if(promo != NULL){
-        if(buscarLiquido (prod, promo -> liquido)){
-            promo -> liquido = ajustarArreglo(promo -> liquido, prod);
-        }
-    }
 }
 
 struct Producto ** ajustarArreglo (struct Producto **arreglo, struct Producto *prod){
@@ -636,41 +679,4 @@ void eliminarProductoArreglo (struct Producto **arreglo, struct Producto *prod){
             arreglo[i] = NULL;
         }
     }
-}
-
-int eliminarPromocion(int codigo, struct Sucursal *sucursal){
-    if(buscarProducto (codigo, sucursal -> productos)){
-        eliminarDatosPromocion(sucursal -> promociones[codigo]);
-        sucursal -> promociones[codigo] = NULL;
-        sucursal -> productos[codigo] = NULL;
-        return 1; 
-    }
-    return 0;
-}
-
-
-void eliminarDatosPromocion (struct Promocion *promo){
-    free(promo -> consumo);
-    promo -> consumo = NULL;
-    
-    free(promo -> liquido);
-    promo -> liquido = NULL;
-    
-    promo -> dato = NULL;
-}
-
-struct Producto * modificarPromocion(int codigo, char *nombre, int precio, struct Producto **consumo, struct Producto **liquido, struct Sucursal *sucursal){
-    struct Producto *prod = sucursal -> productos[codigo];
-    
-    if(buscarProducto (codigo, sucursal -> productos)){
-        prod -> codigo = codigo;
-        prod -> precio = precio;
-        
-        prod -> nombre = NULL;
-        prod -> nombre = (char*) malloc (sizeof(char) * strlen(nombre));
-        strcpy(prod -> nombre, nombre); 
-        
-        sucursal -> promociones[codigo] = crearPromocion (buscarProducto (codigo, sucursal -> productos), consumo, liquido);
-    }
-    return NULL;
 }
